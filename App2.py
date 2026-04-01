@@ -12,13 +12,13 @@ st.write("Faça o upload do seu relatório de rastreamento para gerar os indicad
 
 # Horário limite (Saída da doca/Bipe final) - SEU CÓDIGO ORIGINAL
 horarios_saida = {
-    'LOGPLACE': '20:00:00',
+    'LOGPLACE': '14:00:00',
     'AZUL NINJA': '15:00:00',
-    'TOTAL EXPRESS - EXPRESSO': '15:00:00',
-    'CORREIOS PAC': '20:00:00',
-    'CORREIOS SEDEX': '20:00:00',
+    'TOTAL EXPRESS - EXPRESSO': '16:00:00',
+    'CORREIOS PAC': '16:00:00',
+    'CORREIOS SEDEX': '16:00:00',
     'FAVORITA': '20:00:00',
-    'TOTAL EXPRESS - STANDARD': '15:00:00',
+    'TOTAL EXPRESS - STANDARD': '16:00:00',
     'JADLOG': '23:59:00',
     'JADLOG - LEVES': '23:59:00',
     'JADLOG PESADOS': '23:59:00',
@@ -30,13 +30,13 @@ horarios_saida = {
 
 # Horário de Corte (Disponibilização da carga) - DADOS DO SEU PRINT
 horarios_corte_disp = {
-    'LOGPLACE': '19:00:00',
+    'LOGPLACE': '13:00:00',
     'AZUL NINJA': '14:00:00',
-    'TOTAL EXPRESS - EXPRESSO': '14:00:00',
-    'CORREIOS PAC': '19:00:00',
-    'CORREIOS SEDEX': '19:00:00',
+    'TOTAL EXPRESS - EXPRESSO': '15:00:00',
+    'CORREIOS PAC': '15:00:00',
+    'CORREIOS SEDEX': '15:00:00',
     'FAVORITA': '19:00:00',
-    'TOTAL EXPRESS - STANDARD': '14:00:00',
+    'TOTAL EXPRESS - STANDARD': '15:00:00',
     'JADLOG': '19:00:00',
     'JADLOG - LEVES': '19:00:00', 
     'JADLOG PESADOS': '19:00:00',
