@@ -17,7 +17,7 @@ feriados_br = holidays.Brazil()
 # Horário limite (Saída da doca/Bipe final)
 horarios_saida = {
     'LOGPLACE': '14:00:00',
-    'AZUL NINJA': '15:00:00',
+    'AZUL CARGO - NINJA': '15:00:00',
     'TOTAL EXPRESS - EXPRESSO': '16:00:00',
     'CORREIOS PAC': '16:00:00',
     'CORREIOS SEDEX': '16:00:00',
@@ -27,26 +27,24 @@ horarios_saida = {
     'JADLOG - LEVES': '17:00:00',
     'JADLOG PESADOS': '17:00:00',
     'MAGALOG (IN)': '20:30:00',
-    'AZUL': '20:00:00',
-    'AZUL CARGO': '20:00:00',
+    'AZUL CARGO - E-COMMERCE': '20:00:00',
     'MOVVI': '15:00:00'
 }
 
 # Horário de Corte (Disponibilização da carga)
 horarios_corte_disp = {
     'LOGPLACE': '13:00:00',
-    'AZUL NINJA': '14:00:00',
-    'TOTAL EXPRESS - EXPRESSO': '15:00:00',
+    'AZUL CARGO - NINJA': '14:00:00',
+    'TOTAL EXPRESS - EXPRESSO': '14:00:00',
     'CORREIOS PAC': '15:00:00',
     'CORREIOS SEDEX': '15:00:00',
     'FAVORITA': '19:00:00',
-    'TOTAL EXPRESS - STANDARD': '15:00:00',
+    'TOTAL EXPRESS - STANDARD': '14:00:00',
     'JADLOG': '14:00:00',
     'JADLOG - LEVES': '14:00:00', 
     'JADLOG PESADOS': '14:00:00',
     'MAGALOG (IN)': '19:00:00',
-    'AZUL': '19:00:00',
-    'AZUL CARGO': '19:00:00', 
+    'AZUL CARGO - E-COMMERCE': '19:00:00', 
     'MOVVI': '14:00:00'
 }
 
