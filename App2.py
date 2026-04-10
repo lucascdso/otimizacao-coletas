@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 from datetime import timedelta
 import io
-import holidays # NOVA IMPORTAÇÃO (necessário instalar: pip install holidays)
+import holidays
 
 # ==============================================================================
 # 1. CONFIGURAÇÕES DA PÁGINA E VARIÁVEIS GERAIS
@@ -49,14 +49,15 @@ horarios_corte_disp = {
 }
 
 # ==============================================================================
-# 2. FUNÇÃO DO MOTOR DE SLA (Dupla Validação)
+# 2. FUNÇÃO DO MOTOR DE SLA (Dupla Validação) - ATUALIZADA
 # ==============================================================================
 def classificar_sla(row):
     transp = str(row.get('Transportadora', '')).strip().upper()
     dt_disp = row.get('Dt/Hr Disp Coleta')
     dt_coleta = row.get('Dt/Hr Coleta')
     
-    if pd.isna(dt_disp) or pd.isna(dt_coleta): 
+    # Se não tiver a data de disponibilização, aí sim é sem dados
+    if pd.isna(dt_disp): 
         return pd.Series([pd.NaT, 'Sem Dados', 'Não'])
         
     # Busca os horários mapeados para a transportadora (ordena por tamanho para nomes compostos)
@@ -76,18 +77,22 @@ def classificar_sla(row):
         data_prazo += timedelta(days=1)
         
     # 3. Garante que o prazo final caia em um dia útil (pula sábado, domingo e FERIADOS)
-    # 0=Seg, 1=Ter, 2=Qua, 3=Qui, 4=Sex, 5=Sáb, 6=Dom
     while data_prazo.weekday() > 4 or data_prazo in feriados_br: 
         data_prazo += timedelta(days=1)
         
     # 4. Junta a data calculada com o horário de SAÍDA (bipe) original
     prazo_limite = pd.to_datetime(f"{data_prazo} {horario_saida_str}")
     
-    # 5. Compara
-    status = 'No Prazo' if dt_coleta <= prazo_limite else 'Atrasado'
-    
-    # 6. Validação "Bipado no dia?" (Coletado no mesmo dia do prazo limite até às 23:59)
-    bipado_no_dia = 'Sim' if dt_coleta.date() <= prazo_limite.date() else 'Não'
+    # 5. Avaliação com ou sem coleta realizada
+    if pd.isna(dt_coleta):
+        agora = pd.Timestamp.now()
+        # Sem coleta: Compara o limite com a data/hora atual
+        status = 'Atrasado' if agora > prazo_limite else 'No Prazo'
+        bipado_no_dia = 'Não'
+    else:
+        # Com coleta: Compara o limite com a data da coleta
+        status = 'No Prazo' if dt_coleta <= prazo_limite else 'Atrasado'
+        bipado_no_dia = 'Sim' if dt_coleta.date() <= prazo_limite.date() else 'Não'
     
     return pd.Series([prazo_limite, status, bipado_no_dia])
 
@@ -138,7 +143,7 @@ if uploaded_file is not None:
             df['Dt/Hr Disp Coleta'] = pd.to_datetime(df['Dt/Hr Disp Coleta'], dayfirst=True, errors='coerce')
             df['Dt/Hr Coleta'] = pd.to_datetime(df['Dt/Hr Coleta'], dayfirst=True, errors='coerce')
 
-            # Aplica motor SLA (Agora com 3 colunas, incluindo 'Bipado no dia?')
+            # Aplica motor SLA
             df[['Prazo_Limite_SLA', 'Status_SLA', 'Bipado no dia?']] = df.apply(classificar_sla, axis=1)
 
             # Separa os dados válidos
@@ -170,7 +175,7 @@ if uploaded_file is not None:
             Total_Pedidos=('Pedido', 'count'),
             Coletados_No_Prazo=('Status_SLA', lambda x: (x == 'No Prazo').sum()),
             Coletados_Atrasados=('Status_SLA', lambda x: (x == 'Atrasado').sum()),
-            Atrasos_No_Dia=('Atrasado_Bipado_Dia', 'sum'), # Variável temporária para ajudar no cálculo
+            Atrasos_No_Dia=('Atrasado_Bipado_Dia', 'sum'),
             Media_Peso_Atrasados_KG=('Status_SLA', lambda x: df_valido.loc[x[x == 'Atrasado'].index, 'Peso'].mean())
         )
 
@@ -188,7 +193,7 @@ if uploaded_file is not None:
         
         resumo['Media_Peso_Atrasados_KG'] = resumo['Media_Peso_Atrasados_KG'].round(2).fillna(0)
 
-        # Atualizando as colunas (Sem bagunçar a grade original, apenas inserindo o NS Dia (%))
+        # Atualizando as colunas
         cols_ordem = ['Total_Pedidos', 'Coletados_No_Prazo', 'Coletados_Atrasados', 'Media_Peso_Atrasados_KG', 'Atrasos Mono (%)', 'Atrasos Multi (%)', 'NS Dia (%)', 'NS de Coleta (%)']
         resumo_display = resumo[cols_ordem].sort_values('NS de Coleta (%)', ascending=True)
 
@@ -198,7 +203,6 @@ if uploaded_file is not None:
         st.subheader("📥 Exportação de Dados")
         
         df_atrasados = df_valido[df_valido['Status_SLA'] == 'Atrasado'].copy()
-        # Adicionei a flag de "Bipado no dia?" aqui também para análise cirúrgica de dados
         output_cols_atrasados = ['Transportadora', 'Pedido', 'Dt/Hr Pgto', 'Dt/Hr Disp Coleta', 'Dt/Hr Coleta', 'Prazo_Limite_SLA', 'Status_SLA', 'Bipado no dia?', 'Status Tracking']
         
         cols_existentes = [c for c in output_cols_atrasados if c in df_atrasados.columns]
